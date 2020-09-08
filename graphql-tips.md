@@ -44,3 +44,12 @@ mutation{
     id: "2"
   )
 }
+
+query {
+    login(
+      auth: { 
+        email: "user@email.com", 
+        password: "pasword" 
+      }
+    ) 
+}

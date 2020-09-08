@@ -4,8 +4,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 @ObjectType()
 @Entity()
 export class User {
-
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn()//'uuid'
   @Field(() => ID)
   id: string;
 
@@ -14,4 +13,7 @@ export class User {
 
   @Column()
   email: string;
+
+  @Column()
+  password: string;
 }

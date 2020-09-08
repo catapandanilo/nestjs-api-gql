@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import * as jwt from 'jsonwebtoken';
+import { jwtConstants } from 'src/auth/constants';
 
 @Injectable()
 export class UserService {
@@ -12,12 +14,12 @@ export class UserService {
     private readonly userRepository: Repository<User>
   ) { }
 
-  async findAllUsers(): Promise<User[]> {
+  async findAll(): Promise<User[]> {
     const users = await this.userRepository.find();
     return users;
   }
 
-  async findUserById(id: string): Promise<User> {
+  async findById(id: string): Promise<User> {
     const user = await this.userRepository.findOne(id);
     if (!user) {
       throw new NotFoundException('User not found')
@@ -25,7 +27,19 @@ export class UserService {
     return user;
   }
 
-  async createUser(data: CreateUserInput): Promise<User> {
+  async findByEmail(email: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: {
+        email,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found')
+    }
+    return user;
+  }
+
+  async create(data: CreateUserInput): Promise<User> {
     const user = this.userRepository.create(data);
     const userSaved = await this.userRepository.save(user);
 
@@ -36,15 +50,15 @@ export class UserService {
     return userSaved;
   }
 
-  async updateUser(id: string, data: UpdateUserInput): Promise<User> {
-    const user = await this.findUserById(id);
+  async update(id: string, data: UpdateUserInput): Promise<User> {
+    const user = await this.findById(id);
     await this.userRepository.update(user, { ...data });
     const userUpdated = this.userRepository.create({ ...user, ...data });
     return userUpdated;
   }
 
-  async deleteUser(id: string): Promise<boolean> {
-    const user = await this.findUserById(id);
+  async delete(id: string): Promise<boolean> {
+    const user = await this.findById(id);
     const deleted = await this.userRepository.delete(user);
     return deleted ? true : false;
   }

@@ -1,5 +1,5 @@
 import { InputType } from "@nestjs/graphql";
-import { IsString, IsNotEmpty, IsEmail, IsOptional } from "class-validator"
+import { IsString, IsNotEmpty, IsEmail, IsOptional, MinLength, MaxLength } from "class-validator"
 
 @InputType()
 export class UpdateUserInput {
@@ -12,4 +12,10 @@ export class UpdateUserInput {
   @IsNotEmpty({ message: 'The email field cannot be empty!' })
   @IsOptional()
   email?: string;
+
+  @MinLength(4)
+  @MaxLength(20)
+  @IsNotEmpty({ message: 'The password field cannot be empty!' })
+  @IsOptional()
+  password?: string
 }
