@@ -1,18 +1,37 @@
-import { Resolver, Query, Args, InputType, Field } from '@nestjs/graphql';
+import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
-import { Auth1 } from './auth1.input';
+import { AuthParamsInput } from './dto/auth-params.input';
+import { UserService } from 'src/user/user.service';
+import { UnauthorizedException } from '@nestjs/common';
 
 @Resolver('Auth')
 export class AuthResolver {
   constructor(
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly userService: UserService
   ) { }
 
   @Query(() => String)
   async login(
-    @Args('auth') { email, password }: Auth1
-  ): Promise<any> {
-    const token = await this.authService.login({ email, password });
-    return token
+    @Args('params') { email, password }: AuthParamsInput
+  ): Promise<string> {
+
+    try {
+      await this.userService.findByEmail(email);
+
+      // const valid = await bcryptjs.compare(password, user.password);
+      // if (!valid) {
+      //   throw new UnauthorizedException('Email or password incorrect');
+      // }
+
+      // const payload = { email: user.email, password: user.password };
+      // const jwt = this.jwt.sign(payload);
+      // res.cookie('token', jwt, { httpOnly: true });
+
+      return await this.authService.login({ email, password })
+    } catch (error) {
+      throw new UnauthorizedException('Email or password incorrect');
+    }
   }
+
 }
